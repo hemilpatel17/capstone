@@ -23,16 +23,16 @@ extern uint8_t BigFont[];
 
 //Create an instance of Mp3 Library
 Adafruit_VS1053_FilePlayer musicPlayer =
-Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
+        Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
 
 //Create an instance of UTFT + LCD screen
-UTFT myGLCD(EHOUSE70, 22,23,31,33);
-UTouch  myTouch(25,26,27,29,30);
-UTFT_SdRaw myFiles(&myGLCD);
+UTFT          myGLCD(EHOUSE70, 22,23,31,33);
+UTouch        myTouch(25,26,27,29,30);
+UTFT_SdRaw    myFiles(&myGLCD);
 UTFT_Buttons  myButtons(&myGLCD, &myTouch);
 
 //Global variables
-uint8_t counter = 3; //.TODO : Use due flash storage to get this count 
+uint8_t counter = 3; //TODO : Use due flash storage to get this count 
 
 
 void setup() {
@@ -40,8 +40,6 @@ void setup() {
     while(!Serial) {
         ;//need for due
     }
-    
-    //TODO : Get the settings for volume and counter from due flash storge
     
     //Initialize the SD card
     while(!sd.begin(CARDCS,SPI_FULL_SPEED)) {

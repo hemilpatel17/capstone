@@ -31,6 +31,9 @@ UTouch  myTouch(25,26,27,29,30);
 UTFT_SdRaw myFiles(&myGLCD);
 UTFT_Buttons  myButtons(&myGLCD, &myTouch);
 
+//Global variables
+uint8_t counter = 3; //.TODO : Use due flash storage to get this count 
+
 
 void setup() {
     Serial.begin(9600);
@@ -66,7 +69,7 @@ void setup() {
     //TODO : Add 'Hello I am pouchy come talk to me'
     //TODO : Add a picture of hello
     //TODO : Add a button that will say 'Settings'
-    //TODO : if settting then go to admin menu 
+    //TODO : if settting then go to admin menu else let it go to loop
     
 
     startUp();
@@ -75,6 +78,7 @@ void setup() {
 
 void loop() {
     // put your main code here, to run repeatedly:
+    //TODO : 
     
 }
 
@@ -90,16 +94,40 @@ void startUp() {
     myFiles.load(0,0,800,480,"PICTURES/hello.raw",1,1);
     int admin =  myButtons.addButton(599,0,200,50,"ADMIN");
     myButtons.drawButton(admin);
-   
-    while(1){
+    
+    Serial.println(F("Playing 'Hello Message.'"));
+    musicPlayer.playFullFile("MESSAGES/track001.mp3");
+    
+    //Check if settings was pressed 
+    /*while(1){
       myTouch.read();
       x=myTouch.getX();
       y=myTouch.getY();
       if((x >= 10 && x <= 30) && (y >= 180 && y <= 240)) {
-        Serial.println("Touch detected");
+        Serial.println(F("Touch detected"));
+        break;
         } 
-    }
-    Serial.println(F("Playing 'Hello Message.'"));
-    musicPlayer.playFullFile("MESSAGES/hello.mp3");
+    }*/
+    checkTouch(10,30,180,240);
+    
+   
   
   }
+
+
+  //Check if there is a touch
+  void checkTouch(int x1, int x2, int y1, int y2){
+    int x = 0;      //x and y are signed because value can be -1 when you read from the screen
+    int y = 0;
+    unsigned long startTime = millis();
+    while((millis() - startTime) <= (counter * 1000){
+      myTouch.read();
+      x=myTouch.getX();
+      y=myTouch.getY();
+      if((x >= x1 && x <= x2) && (y >= y1 && y <= y2)) {
+        Serial.println(F("Touch detected"));
+        break;
+        } 
+    }
+
+    }

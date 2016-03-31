@@ -99,20 +99,11 @@ void startUp() {
     Serial.println(F("Playing 'Hello Message.'"));
     musicPlayer.playFullFile("MESSAGES/track001.mp3");
     
-    //Check if settings was pressed 
-    /*while(1){
-      myTouch.read();
-      x=myTouch.getX();
-      y=myTouch.getY();
-      if((x >= 10 && x <= 30) && (y >= 180 && y <= 240)) {
-        Serial.println(F("Touch detected"));
-        break;
-        } 
-    }*/
+    //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup 
     if(checkTouch(10,30,180,240)) {
         //TODO : go to settings page , if not do not do anything and let the system go to loop
       }
-  }
+}
 
 //-----------------Bigger system modules----------------//
 //This module is for settings page and user program only only
@@ -126,10 +117,17 @@ void settingsPage() {
 
   //Delay : Add button, Update delay counter
   }
-
+ 
 void userProgram()  {
   
-  }
+    //do this for however many images there are in the sd card 
+    //Display image
+    //Read input from user
+    //if there is an input from switch, audio out the message
+
+    //for the last image, play random music till there is interrupt from user
+    
+}
 
 //------------------Smaller modules------------------------//
 //This module should do basic things like checkButtons, set counters etc.
@@ -151,7 +149,7 @@ boolean checkTouch(int x1, int x2, int y1, int y2){
         } 
     }
     return false;
-  }
+}
 
  
  

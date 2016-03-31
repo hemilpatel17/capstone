@@ -78,10 +78,11 @@ void setup() {
 
 void loop() {
     // put your main code here, to run repeatedly:
-    //TODO : 
+    //TODO : add the main program code here, no settings should be done here 
+    
     
 }
-
+//------------Startup module---------------// 
 void startUp() {
     int adminPress = 0;
     int x = 0;
@@ -108,27 +109,49 @@ void startUp() {
         break;
         } 
     }*/
-    checkTouch(10,30,180,240);
-    
-   
+    if(checkTouch(10,30,180,240)) {
+        //TODO : go to settings page , if not do not do anything and let the system go to loop
+      }
+  }
+
+//-----------------Bigger system modules----------------//
+//This module is for settings page and user program only only
+//NO LOWER LEVEL CODE HERE
+
+//Settings Page
+void settingsPage() {
+  //TODO: add two buttons , one for volume and one for system counter, if volume is not needed then just do not add
+  
+  //Volume Button : Update volume counter
+
+  //Delay : Add button, Update delay counter
+  }
+
+void userProgram()  {
   
   }
 
+//------------------Smaller modules------------------------//
+//This module should do basic things like checkButtons, set counters etc.
+//ALL PRE-LOWER/PRE-LIBRARY CODE GOES HERE , I am too lazy to create headers and other files or what not
 
-  //Check if there is a touch
-  void checkTouch(int x1, int x2, int y1, int y2){
+//Check if there is a touch
+boolean checkTouch(int x1, int x2, int y1, int y2){
     int x = 0;      //x and y are signed because value can be -1 when you read from the screen
     int y = 0;
     unsigned long startTime = millis();
-    while((millis() - startTime) <= (counter * 1000)){   if (touch.dataAvailable() == true)
-      //TODO : maybe add if touch data available 
+    while((millis() - startTime) <= (counter * 1000)){  
+      //TODO : maybe add if touch data available : if (touch.dataAvailable() == true)
       myTouch.read();
       x=myTouch.getX();
       y=myTouch.getY();
       if((x >= x1 && x <= x2) && (y >= y1 && y <= y2)) {
         Serial.println(F("Touch detected"));
-        break;
+        return true;
         } 
     }
+    return false;
+  }
 
-    }
+ 
+ 

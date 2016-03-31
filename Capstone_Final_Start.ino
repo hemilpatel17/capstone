@@ -120,7 +120,7 @@ void startUp() {
     int x = 0;      //x and y are signed because value can be -1 when you read from the screen
     int y = 0;
     unsigned long startTime = millis();
-    while((millis() - startTime) <= (counter * 1000){
+    while((millis() - startTime) <= (counter * 1000)){
       myTouch.read();
       x=myTouch.getX();
       y=myTouch.getY();

@@ -11,6 +11,7 @@ SdFat sd;
 #include <DueFlashStorage.h>
 DueFlashStorage dueFlashStorage;
 
+template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg); return obj; }
 //MP3 Player
 #define BREAKOUT_RESET  9      // VS1053 reset pin (output)
 #define BREAKOUT_CS     10     // VS1053 chip select pin (output)
@@ -148,7 +149,7 @@ boolean checkTouch(int x1, int x2, int y1, int y2){
       x=myTouch.getX();
       y=myTouch.getY();
       if((x >= x1 && x <= x2) && (y >= y1 && y <= y2)) {
-        Serial.println(F("Touch detected"));
+        Serial << "Touch detected at co-ordinates x: " << x << " and y: " << y << "\n";
         return true;
         } 
     }

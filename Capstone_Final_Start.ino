@@ -74,8 +74,6 @@ void setup() {
     //TODO : Add a picture of hello
     //TODO : Add a button that will say 'Settings'
     //TODO : if settting then go to admin menu else let it go to loop
-    
-
     startUp();
 
 }
@@ -84,6 +82,7 @@ void loop() {
     // put your main code here, to run repeatedly:
     //TODO : add the user program code here, no settings should be done here 
     
+    userProgram();
     
 }
 //------------Startup module---------------// 
@@ -106,7 +105,7 @@ void startUp() {
     //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup 
     if(checkTouch(10,30,180,240)) {
         //TODO : go to settings page , if not, do not do anything and let the system go to loop
-      
+        settingsPage();
       }
 }
 

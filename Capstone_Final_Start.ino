@@ -8,6 +8,8 @@
 //#include <SD.h>
 #include <SdFat.h>
 SdFat sd;
+#include <DueFlashStorage.h>
+DueFlashStorage dueFlashStorage;
 
 //MP3 Player
 #define BREAKOUT_RESET  9      // VS1053 reset pin (output)
@@ -32,8 +34,11 @@ UTFT_SdRaw    myFiles(&myGLCD);
 UTFT_Buttons  myButtons(&myGLCD, &myTouch);
 
 //Global variables
-uint8_t counter = 3; //TODO : Use due flash storage to get this count 
+uint8_t counter = 3;//dueFlash; //TODO : Use due flash storage to get this count 
+uint8_t volume = 20; //TODO : Use due flash storage to get this count
 
+int resH = 480; //Height resolution
+int resL = 800; //Length resoltuion
 
 void setup() {
     Serial.begin(9600);
@@ -51,8 +56,8 @@ void setup() {
     while(!musicPlayer.begin()) {
       Serial.println(F("Music player failed to initialized, continuously trying to initialize it"));
       }
-     
-     musicPlayer.setVolume(20,20);
+     //TODO : set this from the counter
+     musicPlayer.setVolume(volume,volume);
      musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT);  // DREQ int
   
     //Initialize LCD and UTFT
@@ -76,7 +81,7 @@ void setup() {
 
 void loop() {
     // put your main code here, to run repeatedly:
-    //TODO : add the main program code here, no settings should be done here 
+    //TODO : add the user program code here, no settings should be done here 
     
     
 }
@@ -95,11 +100,12 @@ void startUp() {
     myButtons.drawButton(admin);
     
     Serial.println(F("Playing 'Hello Message.'"));
-    musicPlayer.playFullFile("MESSAGES/track001.mp3");
+    musicPlayer.playFullFile("MESSAGES/hello.mp3");
     
     //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup 
     if(checkTouch(10,30,180,240)) {
-        //TODO : go to settings page , if not do not do anything and let the system go to loop
+        //TODO : go to settings page , if not, do not do anything and let the system go to loop
+      
       }
 }
 
@@ -136,7 +142,7 @@ boolean checkTouch(int x1, int x2, int y1, int y2){
     int x = 0;      //x and y are signed because value can be -1 when you read from the screen
     int y = 0;
     unsigned long startTime = millis();
-    while((millis() - startTime) <= (counter * 1000)){  
+    while((millis() - startTime) <= (counter * 1000)){  //counter * 1000 returns how many milliseconds to wait
       //TODO : maybe add if touch data available : if (touch.dataAvailable() == true)
       myTouch.read();
       x=myTouch.getX();

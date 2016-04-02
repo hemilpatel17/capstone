@@ -21,12 +21,16 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 //Card CS
 #define CARDCS          42     // Card chip select pin
 
-//Program Specific defines
+//####Program Specific defines####//
+//message size
 #define MESSAGE_SIZE    7         //TODO : maybe we dont need this, if we can dynamically get the message array length
 
+//switches
 #define SWITCH1         4 //blue   //if only need digtal then we have 4,5,6,7 and 2 available ,plenty of analog inputs available as well
 #define SWITCH2         5 //red   //if need to be analog A0 and A1 should suffice
 
+//max track size
+#define MAX_TRACK_SIZE  10
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
 
@@ -55,6 +59,7 @@ String messages [MESSAGE_SIZE] = {
   "message7"
   };
 
+//Initial setup when the system boots up
 void setup() {
     Serial.begin(9600);
     while(!Serial) {
@@ -71,7 +76,8 @@ void setup() {
     while(!musicPlayer.begin()) {
       Serial.println(F("Music player failed to initialized, continuously trying to initialize it"));
       }
-     //TODO : set this from the counter
+
+     //set music volume
      musicPlayer.setVolume(volume,volume);
      musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT);  // DREQ int
   
@@ -86,18 +92,13 @@ void setup() {
 
     pinMode(SWITCH1, INPUT_PULLUP);
     digitalWrite(SWITCH2, HIGH);
-    //TODO : Add 'Hello I am pouchy come talk to me'
-    //TODO : Add a picture of hello
-    //TODO : Add a button that will say 'Settings'
-    //TODO : if settting then go to admin menu else let it go to loop
+    
     startUp();
 
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
-    //TODO : add the user program code here, no settings should be done here 
-    
     userProgram();
     
 }
@@ -116,11 +117,12 @@ void startUp() {
     myButtons.drawButton(admin);
     
     Serial.println(F("Playing 'Hello Message.'"));
+    //play initial hello message
     musicPlayer.playFullFile("MESSAGES/hello.mp3");
     
     //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup 
     if(checkTouch(10,30,180,240)) {
-        //TODO : go to settings page , if not, do not do anything and let the system go to loop
+        //go to settings page , if not, do not do anything and let the system go to loop
         settingsPage();
       }
 }
@@ -164,7 +166,7 @@ void userProgram()  {
         padVal = chkPads();
         if(padVal > 0) {      //if the value is zero there is no need to check for additional values
             if(padVal == 1){
-                Serial.prinln(F("Pal pad 1 input detected, playing music file."));
+                Serial.println(F("Pal pad 1 input detected, playing music file."));
                 musicPlayer.playFullFile(tempAudio);
               }
             if(padVal == 2){
@@ -172,12 +174,15 @@ void userProgram()  {
                 subCategories(i); 
               }
             if(padVal == 3){
-                  Serial.println(F("Input on both pads was detected, yet to add functionality.");
+                Serial.println(F("Input on both pads was detected, yet to add functionality."));
                 //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
-                //ideas : emergency menu? , yes/no prompt?
+                //ideas : emergency menu? , yes/no prompt? , skip the menu right away to the music file??
               }
           }
-      }  
+      }
+
+      //if there is pal pad press on switch 1, upload a calming picture and play a random music
+      
   }
 
 
@@ -232,5 +237,15 @@ uint8_t chkPads() {
     return 0;
   }
 
+void playRandomTrack(uint8_t maxTracks) {
+    char *trackname;
+    String trackToPlay = "MUSIC/track00" +  random(maxTracks);
+    trackToPlay.toCharArray(trackname,50);
+    musicPlayer.startPlayingFile(trackname); 
+  }
+
+void stopMusic() {
+  musicPlayer.stopPlaying();
+  }
  
  

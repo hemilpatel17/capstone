@@ -24,8 +24,8 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 //Program Specific defines
 #define MESSAGE_SIZE    7     //TODO : maybe we dont need this, if we can dynamically get the message array length
 
-#define SWITCH1         4    //if only need digtal then we have 4,5,6,7 and 2 available ,plenty of analog inputs available as well
-#define SWITCH2         5    //if need to be analog A0 and A1 should suffice
+#define SWITCH1         4 //blue   //if only need digtal then we have 4,5,6,7 and 2 available ,plenty of analog inputs available as well
+#define SWITCH2         5 //red   //if need to be analog A0 and A1 should suffice
 
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
@@ -142,6 +142,7 @@ void userProgram()  {
     //local variables
     char *tempImage, *tempAudio;
     String tempImageString, tempAudioString;
+    uint8_t padVal;
     //do this for however many images there are in the sd card 
     //Display image
     //Read input from user
@@ -159,11 +160,20 @@ void userProgram()  {
         tempAudioString.toCharArray(tempAudio, 50);
         Serial << "Temporary audio file name " << tempAudio << "\n";
         myGLCD.clrScr();
-        myFiles.load(0,0,800,480,tempImage,1,1); 
-        
-      }
-    
-    
+        myFiles.load(0,0,800,480,tempImage,1,1);
+        padVal = chkPads();
+        if(padVal > 0) {      //if the value is zero there is no need to check for additional values
+            if(padVal == 1){
+                musicPlayer.playFullFile(tempAudio);
+              }
+            if(padVal == 2){
+                //TODO : if subcatergories required, do them here 
+              }
+            if(padVal == 3){
+                //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
+              }
+          }
+      }  
   }
 
 //------------------Smaller modules------------------------//
@@ -189,20 +199,26 @@ boolean checkTouch(int x1, int x2, int y1, int y2){
   }
 
 //check if there is touch at tactile pad
-int chkPads() {
-   int but1Pressed = 0;
-   int but2pressed = 0;
+uint8_t chkPads() {
+   uint8_t but1Pressed = 0;
+   uint8_t but2Pressed = 0;
    unsigned long startTime = millis();
    while((millis() - startTime) <= (counter * 1000)) {    //keep checking the input for n seconds
-      but1Pressed = digitalRead(SWITCH);
+      but1Pressed = digitalRead(SWITCH1);
       delay(100);   //maybe decrease the delay in future??, only after testing tho
-      but2Pressed = digitalRead(
-      if(isButtonPressed == LOW) {
-        return 1;
-      }
-      
+      but2Pressed = digitalRead(SWITCH2);
+      delay(100);
+      if((but1Pressed == LOW) && (but2Pressed ==LOW)) {
+          return 3;
+        }
+      if(but2Pressed ==LOW) {
+          return 2;
+        } 
+      if(but1Pressed == LOW) {
+          return 1;
+        }
     }
-    return false;
+    return 0;
   }
 
  

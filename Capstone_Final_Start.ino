@@ -21,6 +21,9 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 //Card CS
 #define CARDCS 42     // Card chip select pin
 
+//Program Specific defines
+#define MESSAGE_SIZE    7   //TODO : maybe we dont need this, if we can dynamically get the message array length
+
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
 
@@ -35,11 +38,19 @@ UTFT_SdRaw    myFiles(&myGLCD);
 UTFT_Buttons  myButtons(&myGLCD, &myTouch);
 
 //Global variables
-uint8_t counter = 3;//dueFlash; //TODO : Use due flash storage to get this count 
-uint8_t volume = 20; //TODO : Use due flash storage to get this count
+uint8_t counter = 3;//dueFlashStorage.read(1); //TODO : Use due flash storage to get this count (will need to initially write first)??
+uint8_t volume = 20; //dueFlashStorage.read(2);/TODO : Use due flash storage to get this count  (will need to initially write first)??
 
-int resH = 480; //Height resolution
-int resL = 800; //Length resoltuion
+//message holder array
+String messages [MESSAGE_SIZE] = {
+  "message1",
+  "message2",
+  "message3",
+  "message4",
+  "message5",
+  "message6",
+  "message7"
+  };
 
 void setup() {
     Serial.begin(9600);
@@ -123,13 +134,23 @@ void settingsPage() {
   }
  
 void userProgram()  {
-  
+    //local variables
     //do this for however many images there are in the sd card 
     //Display image
     //Read input from user
     //if there is an input from switch, audio out the message
-
+    
     //for the last image, play random music till there is interrupt from user
+    for(int i = 0 ; i < MESSAGE_SIZE ; i++){
+        String tempImage = "PICTURES/" + messages[i] + ".raw";
+        Serial << "Temporary image name " << tempImage << "\n";
+        String tempAudio = "MESSAGES/" + [messages[i] + ".mp3";
+        Serial << "Temporary audio file name " << tempAudio << "\n";
+        myGLCD.clrScr();
+        myFiles.load(0,0,800,480,tempImage,1,1); 
+      
+      }
+    
     
 }
 

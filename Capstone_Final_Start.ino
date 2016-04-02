@@ -19,10 +19,10 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 #define DREQ            3      // VS1053 Data request, ideally an Interrupt pin
 
 //Card CS
-#define CARDCS 42     // Card chip select pin
+#define CARDCS          42     // Card chip select pin
 
 //Program Specific defines
-#define MESSAGE_SIZE    7   //TODO : maybe we dont need this, if we can dynamically get the message array length
+#define MESSAGE_SIZE    7     //TODO : maybe we dont need this, if we can dynamically get the message array length
 
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
@@ -41,7 +41,7 @@ UTFT_Buttons  myButtons(&myGLCD, &myTouch);
 uint8_t counter = 3;//dueFlashStorage.read(1); //TODO : Use due flash storage to get this count (will need to initially write first)??
 uint8_t volume = 20; //dueFlashStorage.read(2);/TODO : Use due flash storage to get this count  (will need to initially write first)??
 
-//message holder array
+//message holder array, if looping over works, I wont need have separate container
 String messages [MESSAGE_SIZE] = {
   "message1",
   "message2",
@@ -143,6 +143,9 @@ void userProgram()  {
     //if there is an input from switch, audio out the message
     
     //for the last image, play random music till there is interrupt from user
+    //lets hope that this works
+
+    //TODO : YET TO TEST YET TO TEST YET TO TEST 
     for(int i = 0 ; i < MESSAGE_SIZE ; i++){
         tempImageString = "PICTURES/" + messages[i] + ".raw";
         tempImageString.toCharArray(tempImage, 50);

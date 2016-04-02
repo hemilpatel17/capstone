@@ -24,6 +24,9 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 //Program Specific defines
 #define MESSAGE_SIZE    7     //TODO : maybe we dont need this, if we can dynamically get the message array length
 
+#define SWITCH1         4    //if only need digtal then we have 4,5,6,7 and 2 available ,plenty of analog inputs available as well
+#define SWITCH2         5    //if need to be analog A0 and A1 should suffice
+
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
 
@@ -80,7 +83,9 @@ void setup() {
     myTouch.InitTouch();
     myTouch.setPrecision(PREC_EXTREME);
     myButtons.setTextFont(BigFont);
- 
+
+    pinMode(SWITCH1, INPUT_PULLUP);
+    digitalWrite(SWITCH2, HIGH);
     //TODO : Add 'Hello I am pouchy come talk to me'
     //TODO : Add a picture of hello
     //TODO : Add a button that will say 'Settings'
@@ -155,11 +160,11 @@ void userProgram()  {
         Serial << "Temporary audio file name " << tempAudio << "\n";
         myGLCD.clrScr();
         myFiles.load(0,0,800,480,tempImage,1,1); 
-      
+        
       }
     
     
-}
+  }
 
 //------------------Smaller modules------------------------//
 //This module should do basic things like checkButtons, set counters etc.
@@ -181,7 +186,24 @@ boolean checkTouch(int x1, int x2, int y1, int y2){
         } 
     }
     return false;
-}
+  }
+
+//check if there is touch at tactile pad
+int chkPads() {
+   int but1Pressed = 0;
+   int but2pressed = 0;
+   unsigned long startTime = millis();
+   while((millis() - startTime) <= (counter * 1000)) {    //keep checking the input for n seconds
+      but1Pressed = digitalRead(SWITCH);
+      delay(100);   //maybe decrease the delay in future??, only after testing tho
+      but2Pressed = digitalRead(
+      if(isButtonPressed == LOW) {
+        return 1;
+      }
+      
+    }
+    return false;
+  }
 
  
  

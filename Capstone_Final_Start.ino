@@ -186,7 +186,7 @@ void userProgram()  {
       padVal = chkPads();
       if(padVal > 0 ) {  
           if(padVal == 1) {
-              playRandomTrack();
+              playRandomTrack(MAX_TRACK_SIZE);
             }
           if(padVal = 2) {
               stopMusic();

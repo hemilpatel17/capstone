@@ -167,7 +167,7 @@ void userProgram()  {
                 musicPlayer.playFullFile(tempAudio);
               }
             if(padVal == 2){
-                //TODO : if subcatergories required, do them here 
+                subCategories(i); 
               }
             if(padVal == 3){
                 //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
@@ -175,6 +175,13 @@ void userProgram()  {
           }
       }  
   }
+
+
+void subCategories(uint8_t i) {
+    //TODO input unsigned int to see what main category the program is in 
+  }
+
+
 
 //------------------Smaller modules------------------------//
 //This module should do basic things like checkButtons, set counters etc.

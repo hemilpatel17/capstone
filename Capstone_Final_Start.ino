@@ -135,6 +135,8 @@ void settingsPage() {
  
 void userProgram()  {
     //local variables
+    char *tempImage, *tempAudio;
+    String tempImageString, tempAudioString;
     //do this for however many images there are in the sd card 
     //Display image
     //Read input from user
@@ -142,9 +144,11 @@ void userProgram()  {
     
     //for the last image, play random music till there is interrupt from user
     for(int i = 0 ; i < MESSAGE_SIZE ; i++){
-        String tempImage = "PICTURES/" + messages[i] + ".raw";
+        tempImageString = "PICTURES/" + messages[i] + ".raw";
+        tempImageString.toCharArray(tempImage, 50);
         Serial << "Temporary image name " << tempImage << "\n";
-        String tempAudio = "MESSAGES/" + [messages[i] + ".mp3";
+        tempAudioString = "MESSAGES/" + messages[i] + ".mp3";
+        tempAudioString.toCharArray(tempAudio, 50);
         Serial << "Temporary audio file name " << tempAudio << "\n";
         myGLCD.clrScr();
         myFiles.load(0,0,800,480,tempImage,1,1); 

@@ -181,8 +181,19 @@ void userProgram()  {
           }
       }
 
+      padVal = 0; //reset the pad value to 0 if not already 0
       //if there is pal pad press on switch 1, upload a calming picture and play a random music
-      
+      padVal = chkPads();
+      if(padVal > 0 ) {  
+          if(padVal == 1) {
+              playRandomTrack();
+            }
+          if(padVal = 2) {
+              stopMusic();
+            }
+          if(padVal == 3) {
+            }
+        }       
   }
 
 
@@ -245,7 +256,7 @@ void playRandomTrack(uint8_t maxTracks) {
   }
 
 void stopMusic() {
-  musicPlayer.stopPlaying();
+    musicPlayer.stopPlaying();
   }
  
  

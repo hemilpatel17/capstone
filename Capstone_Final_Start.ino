@@ -18,7 +18,6 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 #define BREAKOUT_DCS    8      // VS1053 Data/command select pin (output)
 #define DREQ            3      // VS1053 Data request, ideally an Interrupt pin
 
-//adding a new line to check if git works
 //Card CS
 #define CARDCS          42     // Card chip select pin
 

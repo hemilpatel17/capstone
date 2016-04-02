@@ -22,7 +22,7 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 #define CARDCS          42     // Card chip select pin
 
 //Program Specific defines
-#define MESSAGE_SIZE    7     //TODO : maybe we dont need this, if we can dynamically get the message array length
+#define MESSAGE_SIZE    7         //TODO : maybe we dont need this, if we can dynamically get the message array length
 
 #define SWITCH1         4 //blue   //if only need digtal then we have 4,5,6,7 and 2 available ,plenty of analog inputs available as well
 #define SWITCH2         5 //red   //if need to be analog A0 and A1 should suffice
@@ -164,13 +164,17 @@ void userProgram()  {
         padVal = chkPads();
         if(padVal > 0) {      //if the value is zero there is no need to check for additional values
             if(padVal == 1){
+                Serial.prinln(F("Pal pad 1 input detected, playing music file."));
                 musicPlayer.playFullFile(tempAudio);
               }
             if(padVal == 2){
+                Serial.println(F("Pal pad 2 input detected, diving into subcategories."));
                 subCategories(i); 
               }
             if(padVal == 3){
+                  Serial.println(F("Input on both pads was detected, yet to add functionality.");
                 //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
+                //ideas : emergency menu? , yes/no prompt?
               }
           }
       }  

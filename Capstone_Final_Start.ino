@@ -249,9 +249,11 @@ void stopMusic() {
 void initializeSettingsPage(){
   //TODO: add two buttons , one for volume and one for system counter, if volume is not needed then just do not add
    myGLCD.clrScr();
+   myGLCD.setFont(BigFont);
    myButtons.deleteAllButtons();
-   myGLCD.print("Volume",250,75);
-   myGLCD.print("Delay",600,75);
+   myGLCD.print("VOLUME",200,75);
+   myGLCD.print("DELAY",550,75);
+   myGLCD.setFont(SmallFont);
    int volume_button_plus =  myButtons.addButton(150,100,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
    int volume_button_minus =  myButtons.addButton(150,200,200,50,"-");    //TODO : chagne where the volume buttons gets displayed on the screen
   

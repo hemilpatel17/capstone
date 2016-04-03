@@ -248,26 +248,24 @@ void stopMusic() {
 
 void initializeSettingsPage(){
   //TODO: add two buttons , one for volume and one for system counter, if volume is not needed then just do not add
-    myGLCD.clrScr();
-    myButtons.deleteAllButtons();
+   myGLCD.clrScr();
+   myButtons.deleteAllButtons();
+   myGLCD.print("Volume",250,75);
+   myGLCD.print("Delay",600,75);
    int volume_button_plus =  myButtons.addButton(150,100,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
    int volume_button_minus =  myButtons.addButton(150,200,200,50,"-");    //TODO : chagne where the volume buttons gets displayed on the screen
   
     int delay_button_plus = myButtons.addButton(500,100,200,50,"+");   //TODO : chagne where the volume buttons gets displayed on the screen
     int delay_button_minus = myButtons.addButton(500,200,200,50,"-");   //TODO : chagne where the volume buttons gets displayed on the screen
 
-    int save = myButtons.addButton(599,0,200,50,"SAVE");             ////TODO : chagne where the volume buttons gets displayed on the screen
+    int save = myButtons.addButton(325,300,200,50,"SAVE");             ////TODO : chagne where the volume buttons gets displayed on the screen
     int x1,y1,x2,y2;                                   //TODO :Change it accordingly
-   
-  
-   
+
    myButtons.drawButton(volume_button_plus);
    myButtons.drawButton(volume_button_minus);
    myButtons.drawButton(delay_button_plus);
    myButtons.drawButton(delay_button_minus);
-   
-   myGLCD.print("Volume",x1,y1);
-   myGLCD.print("Delay",x2,y2);
+   myButtons.drawButton(save);
   
   }
 void updateDelay(char *sign) {

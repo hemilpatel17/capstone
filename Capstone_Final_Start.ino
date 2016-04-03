@@ -58,13 +58,14 @@ void setup() {
     digitalWrite(SWITCH1, HIGH);
      pinMode(SWITCH2, INPUT_PULLUP);
     digitalWrite(SWITCH2, HIGH);
-    startUp();
-
+   
+    //startUp();
+    settingsPage();
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
-    userProgram();
+    //userProgram();
     
 }
 //------------Startup module---------------// 
@@ -89,7 +90,7 @@ void startUp() {
     if(checkTouch(10,30,180,240)) {
         //go to settings page , if not, do not do anything and let the system go to loop
         Serial.println(F("Setttings page goes here"));
-        //settingsPage();
+        settingsPage();
       }
 }
 
@@ -100,9 +101,9 @@ void startUp() {
 //Settings Page
 void settingsPage() {
   initializeSettingsPage();
-    int x1,x2,y1,y2;
+    //int x1,x2,y1,y2;
   //Volume Button : Update volume counter
-   while(1) {
+  /* while(1) {
      if(checkTouch(x1,x2,y1,y2)) {    //check plus sign
         updateVolume("+");
       }else if(checkTouch(x1,x2,y1,y2)) {
@@ -114,7 +115,7 @@ void settingsPage() {
       }else if(checkTouch(x1,x2,y1,y2)) {     //save
         break;
       }
-   }
+   } */
   }
  
 void userProgram()  {
@@ -148,7 +149,7 @@ void userProgram()  {
               if(padVal == 1){
                   Serial.println(F("Pal pad 1 input detected, playing music file."));
                   musicPlayer.startPlayingFile(tempAudio);
-                  delay(2000);
+                  delay(2000);                  //TODO : if audio files are bigger than 2 seconds increase this delay
                    messagePlayed = 1;
                   //break;
                   
@@ -247,16 +248,18 @@ void stopMusic() {
 
 void initializeSettingsPage(){
   //TODO: add two buttons , one for volume and one for system counter, if volume is not needed then just do not add
-   int volume_button_plus =  myButtons.addButton(599,0,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
-   int volume_button_minus =  myButtons.addButton(599,0,200,50,"-");    //TODO : chagne where the volume buttons gets displayed on the screen
+    myGLCD.clrScr();
+    myButtons.deleteAllButtons();
+   int volume_button_plus =  myButtons.addButton(150,100,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
+   int volume_button_minus =  myButtons.addButton(150,200,200,50,"-");    //TODO : chagne where the volume buttons gets displayed on the screen
   
-   int delay_button_plus = myButtons.addButton(599,0,200,50,"+");   //TODO : chagne where the volume buttons gets displayed on the screen
-   int delay_button_minus = myButtons.addButton(599,0,200,50,"-");   //TODO : chagne where the volume buttons gets displayed on the screen
+    int delay_button_plus = myButtons.addButton(500,100,200,50,"+");   //TODO : chagne where the volume buttons gets displayed on the screen
+    int delay_button_minus = myButtons.addButton(500,200,200,50,"-");   //TODO : chagne where the volume buttons gets displayed on the screen
 
-   int save = myButtons.addButton(599,0,200,50,"SAVE");             ////TODO : chagne where the volume buttons gets displayed on the screen
-   int x1,y1,x2,y2;                                   //TODO :Change it accordingly
+    int save = myButtons.addButton(599,0,200,50,"SAVE");             ////TODO : chagne where the volume buttons gets displayed on the screen
+    int x1,y1,x2,y2;                                   //TODO :Change it accordingly
    
-   myButtons.deleteAllButtons();
+  
    
    myButtons.drawButton(volume_button_plus);
    myButtons.drawButton(volume_button_minus);

@@ -31,7 +31,7 @@ void setup() {
     }
     
     //Initialize the SD card
-    while(!sd.begin(CARDCS,SPI_FULL_SPEED)) {
+    while(!sd.begin(CARDCS,SPI_HALF_SPEED)) {
         Serial.println(F("Card failed to initialize, or not in the screen."));
     }
     Serial.println(F("Card Initialized successfully."));
@@ -83,31 +83,43 @@ void startUp() {
     
     Serial.println(F("Playing 'Hello Message.'"));
     //play initial hello message
-    musicPlayer.playFullFile("MESSAGES/hello.mp3");
-    
+    musicPlayer.startPlayingFile("MESSAGES/hello.mp3");
+    delay(2000);
     //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup 
     if(checkTouch(10,30,180,240)) {
         //go to settings page , if not, do not do anything and let the system go to loop
-        settingsPage();
+        Serial.println(F("Setttings page goes here"));
+        //settingsPage();
       }
 }
 
 //-----------------Bigger system modules----------------//
 //This module is for settings page and user program only only
-//NO LOWER LEVEL CODE HERE
+//NO LOWER LEVEL API/CODE HERE
 
 //Settings Page
 void settingsPage() {
-  //TODO: add two buttons , one for volume and one for system counter, if volume is not needed then just do not add
-  
+  initializeSettingsPage();
+    int x1,x2,y1,y2;
   //Volume Button : Update volume counter
-
-  //Delay : Add button, Update delay counter
+   while(1) {
+     if(checkTouch(x1,x2,y1,y2)) {    //check plus sign
+        updateVolume("+");
+      }else if(checkTouch(x1,x2,y1,y2)) {
+        updateVolume("-");
+      }else if(checkTouch(x1,x2,y1,y2)) {
+        updateDelay("+");
+      }else if(checkTouch(x1,x2,y1,y2)) {
+        updateDelay("-");
+      }else if(checkTouch(x1,x2,y1,y2)) {     //save
+        break;
+      }
+   }
   }
  
 void userProgram()  {
     //local variables
-    char *tempImage, *tempAudio;
+    char tempImage[50], tempAudio[50];
     String tempImageString, tempAudioString;
     uint8_t padVal;
     //do this for however many images there are in the sd card 
@@ -117,47 +129,56 @@ void userProgram()  {
     
     //for the last image, play random music till there is interrupt from user
     //lets hope that this works
-
+    uint8_t messagePlayed = 0;
     //TODO : YET TO TEST YET TO TEST YET TO TEST 
     for(int i = 0 ; i < MESSAGE_SIZE ; i++){
-        tempImageString = "PICTURES/" + messages[i] + ".raw";
-        tempImageString.toCharArray(tempImage, 50);
-        Serial << "Temporary image name " << tempImage << "\n";
-        tempAudioString = "MESSAGES/" + messages[i] + ".mp3";
-        tempAudioString.toCharArray(tempAudio, 50);
-        Serial << "Temporary audio file name " << tempAudio << "\n";
-        myGLCD.clrScr();
-        myFiles.load(0,0,800,480,tempImage,1,1);
+       // unsigned long startTime = millis();
+        //while((millis() - startTime) <= (counter * 1000)) {    //keep checking the input for n seconds
+          
+          tempImageString = "PICTURES/" + messages[i] + ".raw";
+          tempImageString.toCharArray(tempImage, 50);
+          Serial << "Temporary image name " << tempImage << "\n";
+          tempAudioString = "MESSAGES/" + messages[i] + ".mp3";
+          tempAudioString.toCharArray(tempAudio, 50);
+          Serial << "Temporary audio file name " << tempAudio << "\n";
+          myGLCD.clrScr();
+          myFiles.load(0,0,800,480,tempImage,16);
+          padVal = chkPads();
+          //if(padVal > 0) {      //if the value is zero there is no need to check for additional values
+              if(padVal == 1){
+                  Serial.println(F("Pal pad 1 input detected, playing music file."));
+                  musicPlayer.startPlayingFile(tempAudio);
+                  delay(2000);
+                   messagePlayed = 1;
+                  //break;
+                  
+                }
+              if(padVal == 2){
+                  Serial.println(F("Pal pad 2 input detected, diving into subcategories."));
+                  subCategories(i); 
+                }
+              if(padVal == 3){
+                  Serial.println(F("Input on both pads was detected, yet to add functionality."));
+                  //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
+                  //ideas : emergency menu? , yes/no prompt? , skip the menu right away to the music file??
+                }
+            //}
+          //}
+          padVal = 0;
+        }
+  
+        padVal = 0; //reset the pad value to 0 if not already 0
+        //if there is pal pad press on switch 1, upload a calming picture and play a random music
         padVal = chkPads();
-        if(padVal > 0) {      //if the value is zero there is no need to check for additional values
-            if(padVal == 1){
-                Serial.println(F("Pal pad 1 input detected, playing music file."));
-                musicPlayer.playFullFile(tempAudio);
+        if(padVal > 0 ) {  
+            if(padVal == 1) {
+                playRandomTrack(MAX_TRACK_SIZE);
               }
-            if(padVal == 2){
-                Serial.println(F("Pal pad 2 input detected, diving into subcategories."));
-                subCategories(i); 
+            if(padVal = 2) {
+                stopMusic();
               }
-            if(padVal == 3){
-                Serial.println(F("Input on both pads was detected, yet to add functionality."));
-                //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
-                //ideas : emergency menu? , yes/no prompt? , skip the menu right away to the music file??
+            if(padVal == 3) {
               }
-          }
-      }
-
-      padVal = 0; //reset the pad value to 0 if not already 0
-      //if there is pal pad press on switch 1, upload a calming picture and play a random music
-      padVal = chkPads();
-      if(padVal > 0 ) {  
-          if(padVal == 1) {
-              playRandomTrack(MAX_TRACK_SIZE);
-            }
-          if(padVal = 2) {
-              stopMusic();
-            }
-          if(padVal == 3) {
-            }
         }       
   }
 
@@ -197,9 +218,9 @@ uint8_t chkPads() {
    unsigned long startTime = millis();
    while((millis() - startTime) <= (counter * 1000)) {    //keep checking the input for n seconds
       but1Pressed = digitalRead(SWITCH1);
-      delay(100);   //maybe decrease the delay in future??, only after testing tho
+      delay(200);   //maybe decrease the delay in future??, only after testing tho
       but2Pressed = digitalRead(SWITCH2);
-      delay(100);
+      delay(200);
       if((but1Pressed == LOW) && (but2Pressed ==LOW)) {
           return 3;
         }
@@ -223,5 +244,44 @@ void playRandomTrack(uint8_t maxTracks) {
 void stopMusic() {
     musicPlayer.stopPlaying();
   }
- 
- 
+
+void initializeSettingsPage(){
+  //TODO: add two buttons , one for volume and one for system counter, if volume is not needed then just do not add
+   int volume_button_plus =  myButtons.addButton(599,0,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
+   int volume_button_minus =  myButtons.addButton(599,0,200,50,"-");    //TODO : chagne where the volume buttons gets displayed on the screen
+  
+   int delay_button_plus = myButtons.addButton(599,0,200,50,"+");   //TODO : chagne where the volume buttons gets displayed on the screen
+   int delay_button_minus = myButtons.addButton(599,0,200,50,"-");   //TODO : chagne where the volume buttons gets displayed on the screen
+
+   int save = myButtons.addButton(599,0,200,50,"SAVE");             ////TODO : chagne where the volume buttons gets displayed on the screen
+   int x1,y1,x2,y2;                                   //TODO :Change it accordingly
+   
+   myButtons.deleteAllButtons();
+   
+   myButtons.drawButton(volume_button_plus);
+   myButtons.drawButton(volume_button_minus);
+   myButtons.drawButton(delay_button_plus);
+   myButtons.drawButton(delay_button_minus);
+   
+   myGLCD.print("Volume",x1,y1);
+   myGLCD.print("Delay",x2,y2);
+  
+  }
+void updateDelay(char *sign) {
+  if(sign == "+") {
+        dueFlashStorage.write(2,volume++);
+      }else{
+        dueFlashStorage.write(2,volume--);
+      }
+  }
+
+   
+void updateVolume(char *sign) {
+    if(sign == "+") {
+        dueFlashStorage.write(2,volume++);
+      }else{
+        dueFlashStorage.write(2,volume--);
+      }
+  }
+
+

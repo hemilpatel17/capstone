@@ -22,7 +22,8 @@ String messages [MESSAGE_SIZE] = {
   "message6",
   "message7"
   };
-
+uint8_t counter = dueFlashStorage.read(1);
+uint8_t volume = dueFlashStorage.read(2);
 //Initial setup when the system boots up
 void setup() {
     Serial.begin(9600);
@@ -58,14 +59,15 @@ void setup() {
     digitalWrite(SWITCH1, HIGH);
      pinMode(SWITCH2, INPUT_PULLUP);
     digitalWrite(SWITCH2, HIGH);
-   
-    //startUp();
-    settingsPage();
+
+    counter = constrain(counter,1,10);
+    volume = constrain(volume,10,100);
+    startUp();
 }
 
 void loop() {
     // put your main code here, to run repeatedly:
-    //userProgram();
+    userProgram();
     
 }
 //------------Startup module---------------// 
@@ -85,9 +87,9 @@ void startUp() {
     Serial.println(F("Playing 'Hello Message.'"));
     //play initial hello message
     musicPlayer.startPlayingFile("MESSAGES/hello.mp3");
-    delay(2000);
+    delay(3000);
     //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup 
-    if(checkTouch(10,30,180,240)) {
+    if(checkTouch(10,30,180,240,counter*1000)) {
         //go to settings page , if not, do not do anything and let the system go to loop
         Serial.println(F("Setttings page goes here"));
         settingsPage();
@@ -101,21 +103,6 @@ void startUp() {
 //Settings Page
 void settingsPage() {
   initializeSettingsPage();
-    //int x1,x2,y1,y2;
-  //Volume Button : Update volume counter
-  /* while(1) {
-     if(checkTouch(x1,x2,y1,y2)) {    //check plus sign
-        updateVolume("+");
-      }else if(checkTouch(x1,x2,y1,y2)) {
-        updateVolume("-");
-      }else if(checkTouch(x1,x2,y1,y2)) {
-        updateDelay("+");
-      }else if(checkTouch(x1,x2,y1,y2)) {
-        updateDelay("-");
-      }else if(checkTouch(x1,x2,y1,y2)) {     //save
-        break;
-      }
-   } */
   }
  
 void userProgram()  {
@@ -195,12 +182,13 @@ void subCategories(uint8_t i) {
 //ALL PRE-LOWER/PRE-LIBRARY CODE GOES HERE , I am too lazy to create headers and other files or what not
 
 //Check if there is a touch
-boolean checkTouch(int x1, int x2, int y1, int y2){
+boolean checkTouch(int x1, int x2, int y1, int y2,uint8_t timeToWaitInMillis){
     int x = 0;      //x and y are signed because value can be -1 when you read from the screen
     int y = 0;
     unsigned long startTime = millis();
-    while((millis() - startTime) <= (counter * 1000)){  //counter * 1000 returns how many milliseconds to wait
+    while((millis() - startTime) <= timeToWaitInMillis){  //counter * 1000 returns how many milliseconds to wait
       //TODO : maybe add if touch data available : if (touch.dataAvailable() == true)
+     if(myTouch.dataAvailable()){
       myTouch.read();
       x=myTouch.getX();
       y=myTouch.getY();
@@ -208,6 +196,7 @@ boolean checkTouch(int x1, int x2, int y1, int y2){
         Serial << "Touch detected at co-ordinates x: " << x << " and y: " << y << "\n";
         return true;
         } 
+     }
     }
     return false;
   }
@@ -252,38 +241,73 @@ void initializeSettingsPage(){
    myGLCD.setFont(BigFont);
    myButtons.deleteAllButtons();
    myGLCD.print("VOLUME",200,75);
-   myGLCD.print("DELAY",550,75);
-   myGLCD.setFont(SmallFont);
-   int volume_button_plus =  myButtons.addButton(150,100,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
+   myGLCD.print("DELAY",575,75);
+   // myGLCD.setFont(SmallFont);
+   int volume_button_plus =  myButtons.addButton(150,99,200,50,"+");    //TODO : chagne where the volume buttons gets displayed on the screen
    int volume_button_minus =  myButtons.addButton(150,200,200,50,"-");    //TODO : chagne where the volume buttons gets displayed on the screen
   
-    int delay_button_plus = myButtons.addButton(500,100,200,50,"+");   //TODO : chagne where the volume buttons gets displayed on the screen
+    int delay_button_plus = myButtons.addButton(500,99,200,50,"+");   //TODO : chagne where the volume buttons gets displayed on the screen
     int delay_button_minus = myButtons.addButton(500,200,200,50,"-");   //TODO : chagne where the volume buttons gets displayed on the screen
 
     int save = myButtons.addButton(325,300,200,50,"SAVE");             ////TODO : chagne where the volume buttons gets displayed on the screen
-    int x1,y1,x2,y2;                                   //TODO :Change it accordingly
-
+    int but;                                  //TODO :Change it accordingly
+    int x, y;
    myButtons.drawButton(volume_button_plus);
    myButtons.drawButton(volume_button_minus);
    myButtons.drawButton(delay_button_plus);
    myButtons.drawButton(delay_button_minus);
    myButtons.drawButton(save);
-  
-  }
+   
+   myGLCD.setFont(SevenSegNumFont);
+   myGLCD.printNumI(volume, 215, 150, 2);
+   myGLCD.printNumI(counter, 570, 150, 2,'0');
+   
+   while(1) {
+            //save
+           if(checkTouch(210,260,90,160,100)){
+              dueFlashStorage.write(2,volume);
+              dueFlashStorage.write(1,counter);
+              break;
+            //Vol+ 
+           }else if(checkTouch(50,100,40,100,100)){
+              updateVolume("+");
+              myGLCD.printNumI(volume, 215, 150, 3,'0');
+            //Vol-
+           }else if(checkTouch(130,180,40,100,100)){
+              updateVolume("-");
+              myGLCD.printNumI(volume, 215, 150, 3, '0');
+            //D+
+           }else if(checkTouch(60,100,150,220,100)){
+              updateDelay("+");
+              myGLCD.printNumI(counter, 570, 150, 2,'0');
+           //D-
+           }else if(checkTouch(130,180,150,220,100)){
+              updateDelay("-");
+              myGLCD.printNumI(counter, 570, 150, 2,'0');
+            }
+    }
+    Serial.println("Menu saved");
+    Serial << "delay : " << counter << " volume " << volume << "\n";
+   }
+   
 void updateDelay(char *sign) {
   if(sign == "+") {
-        dueFlashStorage.write(2,volume++);
+        counter = counter + 1;
+        counter = constrain(counter, 1, 10);
       }else{
-        dueFlashStorage.write(2,volume--);
+        counter = counter - 1;
+        counter = constrain(counter, 1, 10);
       }
   }
 
    
 void updateVolume(char *sign) {
     if(sign == "+") {
-        dueFlashStorage.write(2,volume++);
+        volume = volume + 10;
+        volume = constrain(volume,10,100);
       }else{
-        dueFlashStorage.write(2,volume--);
+        volume = volume - 10;
+        volume = constrain(volume,10,100);
       }
   }
 

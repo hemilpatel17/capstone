@@ -33,9 +33,13 @@ Adafruit_VS1053_FilePlayer musicPlayer =
         Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
         
 //Global variables
-uint8_t counter = 5;//dueFlashStorage.read(1); //TODO : Use due flash storage to get this count (will need to initially write first)??
-uint8_t volume = 20; //dueFlashStorage.read(2);/TODO : Use due flash storage to get this count  (will need to initially write first)??
-
+//uint8_t counter = 5;//dueFlashStorage.read(1); //TODO : Use due flash storage to get this count (will need to initially write first)??
+//uint8_t volume = 20;//dueFlashStorage.read(2);//TODO : Use due flash storage to get this count  (will need to initially write first)??
+//counter = constrain(counter,0,10);
+//volume = constrain(volume,10,100);
 
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
+extern uint8_t SevenSegNumFont[];
+
+

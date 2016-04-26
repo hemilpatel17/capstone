@@ -12,7 +12,7 @@ SdFat sd;
 DueFlashStorage dueFlashStorage;
 #include "capstoneConfig.h"
 
-//message holder array, if looping over works, I wont need have separate container
+//message holder array, (looping over works)
 String messages [MESSAGE_SIZE] = {
     "change",
     "talk",
@@ -22,13 +22,14 @@ String messages [MESSAGE_SIZE] = {
     "walk"
 };
 
+//message holder for subcategories, looping over this works
 String subCat[MESSAGE_SIZE] [SUB_MAX_SIZE] = {
-    "pain", "sick", "",
-    "knock", "", "",
-    "", "", "",
-    "", "", "",
-    "music", "pillow", "side",
-    "nurse", "", ""
+    "pain", "sick", "",         //change
+    "knock", "", "",            //talk
+    "", "", "",                 //yes : no subcategories
+    "", "", "",                 //no : no subcategories
+    "music", "pillow", "side",  //stretch
+    "nurse", "", ""             //walk      
 };
 uint8_t counter = dueFlashStorage.read(1);
 uint8_t volume = dueFlashStorage.read(2);
@@ -62,14 +63,18 @@ void setup() {
     myTouch.InitTouch();
     myTouch.setPrecision(PREC_EXTREME);
     myButtons.setTextFont(BigFont);
-    
+
+    //set the touch pads(adaptivation) to be input pull up
     pinMode(SWITCH1, INPUT_PULLUP);
     digitalWrite(SWITCH1, HIGH);
     pinMode(SWITCH2, INPUT_PULLUP);
     digitalWrite(SWITCH2, HIGH);
-    
+
+    //constrain initially when uploading the code as well as when the system starts up
     counter = constrain(counter,3,10);
     volume = constrain(volume,20,60);
+
+    //go to startup module
     startUp();
 }
 
@@ -140,19 +145,16 @@ void userProgram()  {
         Serial << "Temporary audio file name " << tempAudio << "\n";
         myGLCD.clrScr();
         myFiles.load(0,0,800,480,tempImage,16);
-        
-        padVal = chkPads();
-        //if(padVal > 0) {      //if the value is zero there is no need to check for additional values
+
+        //check pad values
+        padVal = chkPads();   
         if(padVal == 1){
             Serial.println(F("Pal pad 1 input detected, playing music file."));
             musicPlayer.startPlayingFile(tempAudio);
             delay(2000);                  //TODO : if audio files are bigger than 2 seconds increase this delay
-
             while(chkPadsForDelay() != 0){
               delay(10);
-            }
-           
-            
+            }     
         }
         if(padVal == 2){
             Serial.println(F("Pal pad 2 input detected, diving into subcategories."));
@@ -163,8 +165,7 @@ void userProgram()  {
             //TODO : add extra functionalities, if subcategories are require and wait time increases by a lot
             //ideas : emergency menu? , yes/no prompt? , skip the menu right away to the music file??
         }
-        //}
-        //}
+        //reset padvalue, just incase
         padVal = 0;
     }
     
@@ -172,21 +173,21 @@ void userProgram()  {
     //if there is pal pad press on switch 1, upload a calming picture and play a random music
     myGLCD.clrScr();
     myFiles.load(0,0,800,480,"PICTURES/playmusic.raw",16);
-   padVal = chkPads();
-   Serial << "pad value for music is" << padVal << "\n";
-   if(padVal == 1) {
-    playRandomTrack();
-    while(1){ 
+
+    //check pads for music
+    padVal = chkPads();
+    Serial << "pad value for music is" << padVal << "\n";
+    if(padVal == 1) {
+      playRandomTrack();
+      while(1){ 
         padVal = chkPads();
         if(padVal == 2) {
             stopMusic();
             break;
         }
       }
-    }
-   
+    } 
 }
-
 
 void subCategories(uint8_t i) {
     //TODO input unsigned int to see what main category the program is in

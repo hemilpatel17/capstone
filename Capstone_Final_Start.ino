@@ -14,13 +14,21 @@ DueFlashStorage dueFlashStorage;
 
 //message holder array, if looping over works, I wont need have separate container
 String messages [MESSAGE_SIZE] = {
-    "message1",
-    "message2",
-    "message3",
-    "message4",
-    "message5",
-    "message6",
-    "message7"
+    "change",
+    "talk",
+    "yes",
+    "no",
+    "stretch",
+    "walk"
+};
+
+String subCat[MESSAGE_SIZE] [SUB_MAX_SIZE] = {
+    "pain", "sick", "",
+    "knock", "", "",
+    "", "", "",
+    "", "", "",
+    "music", "pillow", "side",
+    "nurse", "", ""
 };
 uint8_t counter = dueFlashStorage.read(1);
 uint8_t volume = dueFlashStorage.read(2);
@@ -60,8 +68,8 @@ void setup() {
     pinMode(SWITCH2, INPUT_PULLUP);
     digitalWrite(SWITCH2, HIGH);
     
-    counter = constrain(counter,1,10);
-    volume = constrain(volume,10,100);
+    counter = constrain(counter,3,10);
+    volume = constrain(volume,20,60);
     startUp();
 }
 
@@ -80,16 +88,17 @@ void startUp() {
     myGLCD.fillScr(255,255,255);
     
     //Start up screen and audio out for start up message
-    myFiles.load(0,0,800,480,"PICTURES/hello.raw",1,1);
+    myFiles.load(0,0,800,480,"PICTURES/hello.raw",16);
     int admin =  myButtons.addButton(599,0,200,50,"ADMIN");
     myButtons.drawButton(admin);
     
     Serial.println(F("Playing 'Hello Message.'"));
     //play initial hello message
+    delay(100); 
     musicPlayer.startPlayingFile("MESSAGES/hello.mp3");
     delay(3000);
     //Checks if settings was pressed and if not go to loop(where main program happens) // will be done in setup
-    if(checkTouch(10,30,180,240,counter*1000)) {
+    if(checkTouch(10,30,180,240,counter*100)) {
         //go to settings page , if not, do not do anything and let the system go to loop
         Serial.println(F("Setttings page goes here"));
         settingsPage();
@@ -117,7 +126,7 @@ void userProgram()  {
     
     //for the last image, play random music till there is interrupt from user
     //lets hope that this works
-    uint8_t messagePlayed = 0;
+
     //TODO : YET TO TEST YET TO TEST YET TO TEST
     for(int i = 0 ; i < MESSAGE_SIZE ; i++){
         // unsigned long startTime = millis();
@@ -131,19 +140,23 @@ void userProgram()  {
         Serial << "Temporary audio file name " << tempAudio << "\n";
         myGLCD.clrScr();
         myFiles.load(0,0,800,480,tempImage,16);
+        
         padVal = chkPads();
         //if(padVal > 0) {      //if the value is zero there is no need to check for additional values
         if(padVal == 1){
             Serial.println(F("Pal pad 1 input detected, playing music file."));
             musicPlayer.startPlayingFile(tempAudio);
             delay(2000);                  //TODO : if audio files are bigger than 2 seconds increase this delay
-            messagePlayed = 1;
-            //break;
+
+            while(chkPadsForDelay() != 0){
+              delay(10);
+            }
+           
             
         }
         if(padVal == 2){
             Serial.println(F("Pal pad 2 input detected, diving into subcategories."));
-            //subCategories(i);
+            subCategories(i);
         }
         if(padVal == 3){
             Serial.println(F("Input on both pads was detected, yet to add functionality."));
@@ -157,17 +170,21 @@ void userProgram()  {
     
     padVal = 0; //reset the pad value to 0 if not already 0
     //if there is pal pad press on switch 1, upload a calming picture and play a random music
-    padVal = chkPads();
-    if(padVal > 0 ) {
-        if(padVal == 1) {
-            playRandomTrack(MAX_TRACK_SIZE);
-        }
-        if(padVal = 2) {
+    myGLCD.clrScr();
+    myFiles.load(0,0,800,480,"PICTURES/playmusic.raw",16);
+   padVal = chkPads();
+   Serial << "pad value for music is" << padVal << "\n";
+   if(padVal == 1) {
+    playRandomTrack();
+    while(1){ 
+        padVal = chkPads();
+        if(padVal == 2) {
             stopMusic();
+            break;
         }
-        if(padVal == 3) {
-        }
+      }
     }
+   
 }
 
 
@@ -175,6 +192,38 @@ void subCategories(uint8_t i) {
     //TODO input unsigned int to see what main category the program is in
     //swtich case??
     //change for git???
+    char tempImage[50], tempAudio[50];
+    String tempImageString, tempAudioString;
+    uint8_t padVal;
+    for (int j = 0 ; j < SUB_MAX_SIZE ; j++){
+      Serial << "I get here\n" ;
+      if(subCat[i][j].length() != 0){
+        Serial << "Subcategory is " << subCat[i][j] << "\n";
+        tempImageString = "PICTURES/" + subCat[i][j] + ".raw";
+        tempImageString.toCharArray(tempImage, 50);
+        Serial << "Temporary image name " << tempImage << "\n";
+        tempAudioString = "MESSAGES/" + subCat[i][j] + ".mp3";
+        tempAudioString.toCharArray(tempAudio, 50);
+        Serial << "Temporary audio file name " << tempAudio << "\n";
+        myGLCD.clrScr();
+        myFiles.load(0,0,800,480,tempImage,16);
+        
+        padVal = chkPads();
+        if(padVal == 1){
+            Serial.println(F("Pal pad 1 input detected, playing music file."));
+            musicPlayer.startPlayingFile(tempAudio);
+            delay(2000);                  //TODO : if audio files are bigger than 2 seconds increase this delay
+
+            while(chkPadsForDelay() != 0){
+              delay(10);
+            } 
+        }
+        if(padVal == 2){
+            Serial.println(F("Pal pad 2 input detected, diving into subcategories."));
+            return;
+        }
+       }
+      }
 }
 
 
@@ -189,7 +238,6 @@ boolean checkTouch(int x1, int x2, int y1, int y2,uint8_t timeToWaitInMillis){
     int y = 0;
     unsigned long startTime = millis();
     while((millis() - startTime) <= timeToWaitInMillis){  //counter * 1000 returns how many milliseconds to wait
-        //TODO : maybe add if touch data available : if (touch.dataAvailable() == true)
         if(myTouch.dataAvailable()){
             myTouch.read();
             x=myTouch.getX();
@@ -210,9 +258,9 @@ uint8_t chkPads() {
     unsigned long startTime = millis();
     while((millis() - startTime) <= (counter * 1000)) {    //keep checking the input for n seconds
         but1Pressed = digitalRead(SWITCH1);
-        delay(200);   //maybe decrease the delay in future??, only after testing tho
+        delay(100);   //maybe decrease the delay in future??, only after testing tho
         but2Pressed = digitalRead(SWITCH2);
-        delay(200);
+        delay(100);
         if((but1Pressed == LOW) && (but2Pressed ==LOW)) {
             return 3;
         }
@@ -226,10 +274,36 @@ uint8_t chkPads() {
     return 0;
 }
 
-void playRandomTrack(uint8_t maxTracks) {
-    char *trackname;
-    String trackToPlay = "MUSIC/track00" +  random(maxTracks);
+uint8_t chkPadsForDelay() {
+    uint8_t but1Pressed = 0;
+    uint8_t but2Pressed = 0;
+    unsigned long startTime = millis();
+    while((millis() - startTime) <= (500)) {    //keep checking the input for n seconds
+        but1Pressed = digitalRead(SWITCH1);
+        delay(100);   //maybe decrease the delay in future??, only after testing tho
+        but2Pressed = digitalRead(SWITCH2);
+        delay(100);
+        if((but1Pressed == LOW) && (but2Pressed ==LOW)) {
+            return 3;
+        }
+        if(but2Pressed ==LOW) {
+            return 2;
+        }
+        if(but1Pressed == LOW) {
+            return 1;
+        }
+    }
+    return 0;
+}
+void playRandomTrack() {
+    musicPlayer.stopPlaying();
+    char trackname[50];
+    String trackNum = String(random(MAX_TRACK_SIZE));
+    Serial << "File num to play " << trackNum;
+    String trackToPlay = "MUSIC/track00" +  trackNum + ".mp3";
+    Serial << "track to play " << trackToPlay << "\n";
     trackToPlay.toCharArray(trackname,50);
+    Serial << "trackname " << trackname << "\n";
     musicPlayer.startPlayingFile(trackname);
 }
 
@@ -261,56 +335,60 @@ void initializeSettingsPage(){
     myButtons.drawButton(save);
     
     myGLCD.setFont(SevenSegNumFont);
-    myGLCD.printNumI(volume, 215, 150, 2);
+    myGLCD.printNumI(60 - volume, 215, 150, 2,'0');
     myGLCD.printNumI(counter, 570, 150, 2,'0');
     
     while(1) {
         //save
-        if(checkTouch(210,260,90,160,100)){
+        //TODO : if touch available ,kills the execution time
+        if(checkTouch(210,260,90,160,10)){
             dueFlashStorage.write(2,volume);
             dueFlashStorage.write(1,counter);
             break;
             //Vol+
-        }else if(checkTouch(50,100,40,100,100)){
+        }else if(checkTouch(50,100,40,100,50)){
             updateVolume("+");
-            myGLCD.printNumI(volume, 215, 150, 3,'0');
+            myGLCD.printNumI(60 - volume, 215, 150, 2,'0');
             //Vol-
-        }else if(checkTouch(130,180,40,100,100)){
+        }else if(checkTouch(130,180,40,100,50)){
             updateVolume("-");
-            myGLCD.printNumI(volume, 215, 150, 3, '0');
+            myGLCD.printNumI(60 - volume, 215, 150, 2, '0');
             //D+
-        }else if(checkTouch(60,100,150,220,100)){
+        }else if(checkTouch(60,100,150,220,50)){
             updateDelay("+");
             myGLCD.printNumI(counter, 570, 150, 2,'0');
             //D-
-        }else if(checkTouch(130,180,150,220,100)){
+        }else if(checkTouch(130,180,150,220,50)){
             updateDelay("-");
             myGLCD.printNumI(counter, 570, 150, 2,'0');
         }
     }
     Serial.println("Menu saved");
     Serial << "delay : " << counter << " volume " << volume << "\n";
+    musicPlayer.setVolume(volume,volume);
 }
 
 void updateDelay(char *sign) {
     if(sign == "+") {
         counter = counter + 1;
-        counter = constrain(counter, 1, 10);
+        counter = constrain(counter, 3, 10);
     }else{
         counter = counter - 1;
-        counter = constrain(counter, 1, 10);
+        counter = constrain(counter, 3, 10);
     }
 }
 
 
 void updateVolume(char *sign) {
     if(sign == "+") {
-        volume = volume + 10;
-        volume = constrain(volume,10,100);
+        volume = (volume - 5);
+       
+        volume = constrain(volume,20,60);
     }else{
-        volume = volume - 10;
-        volume = constrain(volume,10,100);
+        volume = (volume + 5);
+        volume = constrain(volume,20,60);
     }
+    Serial.println(volume);
 }
 
 

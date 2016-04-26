@@ -12,8 +12,8 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 
 //####Program Specific defines####//
 //message size
-#define MESSAGE_SIZE    7         //TODO : maybe we dont need this, if we can dynamically get the message array length
-
+#define MESSAGE_SIZE    6         //TODO : maybe we dont need this, if we can dynamically get the message array length
+#define SUB_MAX_SIZE    3
 //switches
 #define SWITCH1         4 //blue   //if only need digtal then we have 4,5,6,7 and 2 available ,plenty of analog inputs available as well
 #define SWITCH2         5 //red   //if need to be analog A0 and A1 should suffice

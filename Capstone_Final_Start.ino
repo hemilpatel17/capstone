@@ -19,7 +19,9 @@ String messages [MESSAGE_SIZE] = {
     "yes",
     "no",
     "stretch",
-    "walk"
+    "walk",
+    "hungry"
+    
 };
 
 //message holder for subcategories, looping over this works
@@ -29,7 +31,8 @@ String subCat[MESSAGE_SIZE] [SUB_MAX_SIZE] = {
     "", "", "",                 //yes : no subcategories
     "", "", "",                 //no : no subcategories
     "music", "pillow", "side",  //stretch
-    "nurse", "", ""             //walk      
+    "nurse", "", ""             //walk  
+    "", "", ""                  //hyngry   
 };
 uint8_t counter = dueFlashStorage.read(1);
 uint8_t volume = dueFlashStorage.read(2);
@@ -131,12 +134,13 @@ void userProgram()  {
     
     //for the last image, play random music till there is interrupt from user
     //lets hope that this works
-
+    int admin =  myButtons.addButton(599,0,200,50,"ADMIN");
     //TODO : YET TO TEST YET TO TEST YET TO TEST
     for(int i = 0 ; i < MESSAGE_SIZE ; i++){
         // unsigned long startTime = millis();
         //while((millis() - startTime) <= (counter * 1000)) {    //keep checking the input for n seconds
         
+        myButtons.drawButton(admin);
         tempImageString = "PICTURES/" + messages[i] + ".raw";
         tempImageString.toCharArray(tempImage, 50);
         Serial << "Temporary image name " << tempImage << "\n";
@@ -171,22 +175,26 @@ void userProgram()  {
     
     padVal = 0; //reset the pad value to 0 if not already 0
     //if there is pal pad press on switch 1, upload a calming picture and play a random music
+    uint8_t tempVolume = volume;
+    volume = volume + 20;
+    volume = constrain(volume,20,60);
+    musicPlayer.setVolume(volume,volume);
     myGLCD.clrScr();
     myFiles.load(0,0,800,480,"PICTURES/playmusic.raw",16);
-
     //check pads for music
-    padVal = chkPads();
-    Serial << "pad value for music is" << padVal << "\n";
-    if(padVal == 1) {
-      playRandomTrack();
-      while(1){ 
-        padVal = chkPads();
+    while(1) {
+       padVal = chkPadsForDelay();
+       if(padVal == 1) {
+          playRandomTrack();
+       } 
         if(padVal == 2) {
             stopMusic();
             break;
         }
       }
-    } 
+
+    volume = tempVolume;
+    musicPlayer.setVolume(volume,volume);
 }
 
 void subCategories(uint8_t i) {
@@ -265,7 +273,7 @@ uint8_t chkPads() {
         if((but1Pressed == LOW) && (but2Pressed ==LOW)) {
             return 3;
         }
-        if(but2Pressed ==LOW) {
+        if(but2Pressed == LOW) {
             return 2;
         }
         if(but1Pressed == LOW) {
@@ -300,7 +308,7 @@ void playRandomTrack() {
     musicPlayer.stopPlaying();
     char trackname[50];
     String trackNum = String(random(MAX_TRACK_SIZE));
-    Serial << "File num to play " << trackNum;
+    Serial << "File num to play " << trackNum << "\n";
     String trackToPlay = "MUSIC/track00" +  trackNum + ".mp3";
     Serial << "track to play " << trackToPlay << "\n";
     trackToPlay.toCharArray(trackname,50);

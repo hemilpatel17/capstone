@@ -5,7 +5,6 @@
 #include <UTouch.h>
 #include <UTFT_Buttons.h>
 #include <UTFT_SdRaw.h>
-//#include <SD.h>
 #include <SdFat.h>
 SdFat sd;
 #include <DueFlashStorage.h>
